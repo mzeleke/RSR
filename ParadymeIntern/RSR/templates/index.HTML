@@ -1,41 +1,39 @@
 {% extends 'navigation.html' %}
+{% load static %}
 
 {% block content %}
 
-           <div class="inner cover">
+    <div class="inner cover" xmlns="http://www.w3.org/1999/html">
              <h1 class="cover-heading">Upload your resume</h1>
+            <form action="{% url 'RSR:uploaddoc' %}" method="post" enctype="multipart/form-data" id="myform" >
+                 <div align="center">
+                     {% csrf_token %}
+                     <script src="{% static 'js/upload.js' %}"></script>
+                    <input type="file" name="docfile" id="docfile" required>
+                     <label> First Name: </label>
+                <input  type="text" name="firstname" required>
 
-
-             <form action="{% url 'RSR:uploaddoc' %}" method="post" enctype="multipart/form-data" align="center">
-                         <div align="center">
-
-             {% csrf_token %}
-                <p>{{ form.non_field_errors }}</p>
-                <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
-                <p>{{ form.docfile.errors }}{{ form.docfile }}</p>
-                </div>
-                First name:
-                <input style="color: #000000;" type="text" name="firstname">
-
-                Last name:
-                <input style="color: #000000;" type="text" name="lastname">
-                <br><br>
-                <p>   </p>
-                <input type="radio" name="type" value="Prospective Intern"> Prospective Intern<br>
-                <input type="radio" name="type" value="Prospective Employee"> Prospective Employee<br>
-                <input type="radio" name="type" value="Intern">Intern<br>
-                <input type="radio" name="type" value="Employee"> Employee<br><br>
-                <p>   </p>
-                <input class = "button-style" type="submit" value="Upload"/>
+                 <label> Last Name: </label>
+                <input type="text" name="lastname" required>
+                Select Type:
+                <select id="sel" name="type" class="type" required>
+                    <option value="">None </option>
+                    <option value="Prospective Intern">Prospective Intern</option>
+                    <option value="Prospective Employee">Prospective Employee</option>
+                    <option value="Intern">Intern</option>
+                    <option value="Employee">Employee</option>
+                </select>
+                <div id="space"></div><br/><br/>
+                 <button class="button-style" onclick="myfunction()">Upload More Files</button>
+                     <p>   </p>
+                <input class = "button-style" type="submit" value="Upload" id="uploadbtn"/>
+             </div>
             </form>
 
             <p>
 
             <form action="{% url 'RSR:uploadlist' %}">
-
-                 <input type="submit" value="Check the upload list" />
-
-                                  <input class = "button-style" type="submit" value="Check the upload list" />
+               <input class = "button-style" type="submit" value="Check the upload list" />
 
              </form>
             </p>
