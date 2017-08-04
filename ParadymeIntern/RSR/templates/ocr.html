@@ -1,33 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>OCR</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <style type="text/css">
     p.first{
         text-align: center;
         font-size: x-large;
     }
-    p.second{
-        white-space: pre-line;
+    .second{
+        white-space: pre-wrap;
         text-align: center;
+
+    }
+    div[id="div1"]{
+        display: none;
+    }
+    button[id='check']{
+        float: right;
+    }
+    button[id='btn']
+    {
+        margin: auto;
+        display: block;
+    }
+    pre {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 </style>
 <body>
-    <p class="first">
-        {% if status %}
-            Text Extracted!
-        {% else %}
-            Text Not Found!
-                <p style="text-align: center">Error: Path Does Not Exist</p>
-        {% endif %}
-    </p>
-    <p class="second">
-        {{ var }}
-    <p>
+  <a href="{% url 'RSR:ocrsearch' %}">Test our search function here</a>
+  <button id="btn">Click to edit text</button>
+    <form class="second"  method="post" contenteditable="true" id="p1" action="">
+        {% csrf_token %}
+        <input type="hidden" name="docfileID" value="{{ ID }}">
+        <div id="div1" class="second">
+            <pre>{{ var }}</pre>
+            </div>
+    </form>
         <a href="{% url 'RSR:uploadlist' %}">Return to previous page</a>
-    </p>
+  <button class="third" id="check" href="{% url 'RSR:uploadlist' %}">Save</button>
+      <script>
+     $(document).ready(function () {
+         $('#check').click(function () {
+             var input=$("#div1").html();
 
+             $.ajax({
+                 type:"POST",
+                 url:'{% url "RSR:ocr" %}',
+                 data:{
+                     'input':input,
+                     csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+                     'docfileID':{{ ID }},
+                 },
+                 success:function(data,status){
+                 if (status==="success")
+                 {
+                     alert("Changes are saved!");
+                     document.location.href='{% url 'RSR:uploadlist' %}';
+                 }
+                 else alert("Error!");
+                 }
+                 });
+             return false;
+             });
+         $("#btn").click(function () {
+             $("#div1").slideDown("slow");
+         })
+     })
+      </script>
+
+    </div>
 </body>
 </html>
