@@ -6,6 +6,7 @@ from .models import *
 #=======
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
+import json
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -191,14 +192,13 @@ def listdelete(request, template_name='uploadlist.html'):
 
 # OCR TEAM
 
-def rep(text,string):
-    words=text.split(' ')
-    new_text=""
-    for word in words:
-        if word.find(string)==-1:
-            new_text+=word
-            new_text+=' '
-    return new_text
+def SFormat(text):
+    chars={'<pre>':'','</pre>':'\n','&nbsp;':' ','&;amp':'and'}
+    text=str(text)
+    for key,value in chars.items():
+        text=text.replace(key,value)
+    return text
+
 
 @login_required
 def ocr (request):
@@ -206,7 +206,14 @@ def ocr (request):
     var=""
     status=False
     if request.method=='POST':
-        if not request.POST.getlist('dt'):
+        if request.is_ajax() and docID is not None:
+            #print request.POST.get("input")
+            var=request.POST.get("input")
+            var=SFormat(var)
+            #print(var)
+            status=True
+            Document.objects.filter(pk=docID).update(wordstr=var)
+        else:
             var=str
             documents = get_object_or_404(Document, pk=docID)
             if documents.wordstr in [None,""]:
@@ -232,11 +239,6 @@ def ocr (request):
             else:
                 status=True
             var=str(documents.wordstr)
-        elif request.POST.getlist('dt'):
-            var=str(request.POST.get('dt'))
-            #var=rep(var,'&nbsp;')
-            Document.objects.filter(pk=docID).update(wordstr=var)
-            status=True
         context = {'var': var, 'status': status,'ID':docID}
         return render(request, 'ocr.html', context)
     else:
